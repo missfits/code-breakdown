@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Controller bindings · Robot-Code-2026</title>
+  <link rel="stylesheet" href="./diagram.css">
+  <script defer src="./site.bundle.js"></script>
+</head>
+<body data-page="controller-bindings">
+  <div class="layout">
+    <nav class="sidebar" aria-labelledby="views-heading"></nav>
+    <main>
+      <h1>Controller bindings</h1>
+      <p>Explore the competition bindings in <code>RobotContainer.configureBindingsCompetition()</code>. Select a role, then select a controller button to see the Java methods it calls.</p>
+      <fieldset class="controller-toggle">
+        <legend>Controller role</legend>
+        <label><input type="radio" name="controller-role" value="driver" checked> Driver</label>
+        <label><input type="radio" name="controller-role" value="copilot"> Copilot</label>
+      </fieldset>
+      <div id="controller" class="xbox" role="group" aria-label="Xbox controller">
+        <span class="xbox-shell" aria-hidden="true"></span>
+        <span class="xbox-grip xbox-grip-left" aria-hidden="true"></span>
+        <span class="xbox-grip xbox-grip-right" aria-hidden="true"></span>
+        <span class="xbox-mark" aria-hidden="true">ⓧ</span>
+      </div>
+      <table class="binding-table" aria-label="Competition bindings">
+        <thead><tr><th scope="col">Control</th><th scope="col">Action</th><th scope="col">With LB</th></tr></thead>
+        <tbody id="binding-rows"></tbody>
+      </table>
+    </main>
+  </div>
+  <dialog aria-labelledby="method-heading">
+    <form method="dialog"><button aria-label="Close method details" autofocus>Close</button></form>
+    <h2 id="method-heading"></h2>
+    <dl id="method-list"></dl>
+  </dialog>
+</body>
+</html>

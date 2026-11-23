@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Vision · Robot-Code-2026</title>
+  <link rel="stylesheet" href="./diagram.css">
+  <script defer src="./site.bundle.js"></script>
+</head>
+<body data-page="vision">
+  <div class="layout">
+    <nav class="sidebar" aria-labelledby="views-heading"></nav>
+    <main>
+      <h1>Vision</h1>
+      <p>Each camera estimates the robot’s position from AprilTags. The code checks readings individually, compares readings across cameras, then hands accepted measurements to the drivetrain.</p>
+      <p id="diagram-help">Select a box to see the Java methods behind it.</p>
+      <figure aria-describedby="diagram-help">
+        <figcaption id="legend"></figcaption>
+        <div id="diagram" tabindex="0" role="region" aria-label="Vision diagram"><p role="status">Loading diagram…</p></div>
+      </figure>
+    </main>
+  </div>
+  <dialog aria-labelledby="method-heading">
+    <form method="dialog"><button aria-label="Close method details" autofocus>Close</button></form>
+    <h2 id="method-heading"></h2>
+    <dl id="method-list"></dl>
+  </dialog>
+</body>
+</html>
