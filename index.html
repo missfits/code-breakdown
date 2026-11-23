@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Robot-Code-2026 · Architecture</title>
+  <style>
+    :root { font: 100%/1.5 system-ui, sans-serif; color: #f1f5f9; background: #0a0f1b; }
+    body { margin: 0; }
+    .layout {
+      display: grid;
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: 1.5rem;
+      width: min(86rem, calc(100% - 2rem));
+      margin: clamp(2rem, 6vw, 5rem) auto;
+      align-items: start;
+    }
+    .sidebar { padding: 1rem; border: 1px solid #293449; border-radius: 1rem; background: #101827; }
+    .sidebar h2 { margin: 0 0 .75rem; font-size: 1rem; }
+    .sidebar label { display: block; margin-bottom: .25rem; color: #a5b4cc; font-size: .875rem; }
+    .sidebar input, .sidebar button { font: inherit; border-radius: .5rem; color: inherit; }
+    .sidebar input { width: 100%; box-sizing: border-box; padding: .45rem .6rem; border: 1px solid #45546d; background: #0a0f1b; }
+    .sidebar ul { list-style: none; padding: 0; margin: .75rem 0 0; }
+    .sidebar button { width: 100%; padding: .45rem .6rem; border: 1px solid transparent; background: transparent; text-align: left; cursor: pointer; }
+    .sidebar button:hover, .sidebar button[aria-current="page"] { border-color: #7db5ff; background: #172d50; }
+    .sidebar :focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+    .sidebar p { margin: .75rem 0 0; color: #a5b4cc; font-size: .875rem; }
+    @media (max-width: 55rem) { .layout { grid-template-columns: minmax(0, 1fr); } }
+    h1 { margin: .2rem 0 1.5rem; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; }
+    header p { margin: 0; color: #a5b4cc; font-family: ui-monospace, monospace; }
+    figure { margin: 0; border: 1px solid #293449; border-radius: 1rem; background: #101827; }
+    figcaption { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding: 1rem 1.25rem; border-bottom: 1px solid #293449; }
+    .key { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; }
+    .key::before { content: ""; width: .65rem; height: .65rem; border-radius: 50%; background: var(--accent); }
+    .diagram { overflow-x: auto; padding: 1.5rem; }
+    .diagram svg { display: block; width: 100%; min-width: 48rem; height: auto; margin: auto; }
+    .diagram svg g.node rect { rx: 10px; ry: 10px; }
+    .diagram:focus-visible { outline: 2px solid #93c5fd; outline-offset: -3px; }
+  </style>
+</head>
+<body>
+  <div id="app"><p role="status">Loading the architecture diagram…</p></div>
+  <script type="module">
+    const app = document.getElementById("app");
+
+    try {
+      const [{ default: React }, { createRoot }, { default: mermaid }] = await Promise.all([
+        import("https://esm.sh/react@19.1.0"),
+        import("https://esm.sh/react-dom@19.1.0/client?deps=react@19.1.0"),
+        import("https://esm.sh/mermaid@11.12.0"),
+      ]);
+
+      const diagram = `
+        flowchart TD
+          accTitle: Robot-Code-2026 architecture
+          accDescr: Main starts Robot, which creates RobotContainer. RobotContainer configures subsystem wiring, controller bindings, and autonomous routines. The subsystems include the swerve drivetrain, vision, intake and feed, and shooter.
+          Main["Main · entry point"] -->|starts| Robot["Robot · lifecycle and command scheduling"]
+          Robot -->|creates| Container["RobotContainer · wiring and configuration"]
+          Container --> Subsystems["Subsystems"]
+          Container --> Controls["Controller bindings"]
+          Container --> Auto["Autonomous routines"]
+
+          Subsystems --> Drive["Swerve drivetrain"]
+          Subsystems --> Vision["Vision"]
+          Subsystems --> Intake["Intake and feed<br/>Pivot · Roller · Indexer · Column"]
+          Subsystems --> Shooter["Shooter"]
+
+          classDef startup fill:#172d50,stroke:#7db5ff,color:#eff6ff
+          classDef wiring fill:#382658,stroke:#c6a5ff,color:#faf5ff
+          classDef subsystems fill:#123d39,stroke:#64dfcb,color:#ecfdf5
+          classDef commands fill:#493519,stroke:#f5c677,color:#fff7e6
+          class Main,Robot startup
+          class Container wiring
+          class Subsystems,Drive,Vision,Intake,Shooter subsystems
+          class Controls,Auto commands
+        `;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "base",
+        htmlLabels: true,
+        themeVariables: {
+          darkMode: true,
+          background: "#101827",
+          lineColor: "#94a3b8",
+          textColor: "#f1f5f9",
+          edgeLabelBackground: "#101827",
+          fontFamily: "system-ui, sans-serif",
+        },
+      });
+
+      const h = React.createElement;
+      const legend = [
+        ["Startup and lifecycle", "#7db5ff"],
+        ["Robot wiring", "#c6a5ff"],
+        ["Subsystems", "#64dfcb"],
+        ["Controls and autonomous", "#f5c677"],
+      ];
+
+      // Add future views here to include them in navigation and search.
+      const views = [
+        { id: "robot-architecture", title: "Robot architecture", diagram, legend },
+      ];
+
+      function Architecture() {
+        const [viewId, setViewId] = React.useState(views[0].id);
+        const [query, setQuery] = React.useState("");
+        const [rendered, setRendered] = React.useState(null);
+        const view = views.find(({ id }) => id === viewId);
+        const matches = views.filter(({ title }) =>
+          title.toLowerCase().includes(query.trim().toLowerCase()),
+        );
+
+        React.useEffect(() => {
+          let active = true;
+
+          mermaid.render(view.id, view.diagram).then(({ svg }) => {
+            if (active) setRendered({ id: view.id, svg });
+          }).catch((error) => {
+            console.error(error);
+            if (active) setRendered({ id: view.id, error: true });
+          });
+
+          return () => { active = false; };
+        }, [view]);
+
+        const current = rendered?.id === view.id ? rendered : null;
+
+        return h("div", { className: "layout" },
+          h("nav", { className: "sidebar", "aria-labelledby": "views-heading" },
+            h("h2", { id: "views-heading" }, "Views"),
+            h("label", { htmlFor: "view-search" }, "Search views"),
+            h("input", {
+              id: "view-search",
+              type: "search",
+              value: query,
+              onChange: (event) => setQuery(event.target.value),
+            }),
+            matches.length ? h("ul", null, matches.map(({ id, title }) =>
+              h("li", { key: id }, h("button", {
+                type: "button",
+                "aria-current": id === viewId ? "page" : undefined,
+                onClick: () => {
+                  setViewId(id);
+                  setQuery("");
+                },
+              }, title)),
+            )) : h("p", { role: "status" }, "No matching views."),
+          ),
+          h("main", null,
+            h("header", null,
+              h("p", null, "Robot-Code-2026"),
+              h("h1", null, view.title),
+            ),
+            h("figure", null,
+              h("figcaption", null, view.legend.map(([label, color]) =>
+                h("span", { className: "key", key: label, style: { "--accent": color } }, label),
+              )),
+              current?.svg ? h("div", {
+                className: "diagram",
+                role: "region",
+                "aria-label": view.title + " diagram",
+                tabIndex: 0,
+                dangerouslySetInnerHTML: { __html: current.svg },
+              }) : h("div", { className: "diagram", role: current?.error ? "alert" : "status" },
+                current?.error ? "This diagram could not load." : "Loading diagram…",
+              ),
+            ),
+          ),
+        );
+      }
+
+      createRoot(app).render(h(Architecture));
+    } catch (error) {
+      const message = document.createElement("p");
+      message.setAttribute("role", "alert");
+      message.textContent = "The architecture diagram could not load. Refresh the page to try again.";
+      app.replaceChildren(message);
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
